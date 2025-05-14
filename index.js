@@ -1,35 +1,34 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
+const Question = require("./models/Question");
 
 const app = express();
 const PORT = 5000;
-
-// Middleware
+ 
 app.use(cors());
 app.use(express.json());
+require('dotenv').config();
 
-// Connect to MongoDB
-mongoose.connect("mongodb://localhost:27017/quizdb", {
+ 
+const mongouri= process.env.MONGO_URL;
+console.log(mongouri)
+mongoose.connect(process.env.MONGO_URL, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 })
 .then(() => console.log("✅ MongoDB connected"))
 .catch((err) => console.log("❌ MongoDB error:", err));
-
-// Test route
+ 
 app.get("/", (req, res) => {
   res.send("🎉 Quiz API is running!");
 });
-
-// Start server
+ 
 app.listen(PORT, () => {
   console.log(`🚀 Server is running on http://localhost:${PORT}`);
 });
 
-const Question = require("./models/Question");
-
-// Route to get all questions
+ 
 app.get("/api/questions", async (req, res) => {
   try {
     const questions = await Question.find();
@@ -37,9 +36,7 @@ app.get("/api/questions", async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: "Failed to fetch questions" });
   }
-});
-
-// Route to add a new question (optional for seeding)
+}); 
 app.post("/api/questions", async (req, res) => {
   try {
     const newQuestion = new Question(req.body);
